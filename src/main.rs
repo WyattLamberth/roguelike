@@ -2,7 +2,7 @@ use raylib::consts::KeyboardKey::*;
 use raylib::prelude::*;
 
 struct Text {
-    text: String,
+    data: String,
     x: i32,
     y: i32,
     font_size: i32,
@@ -10,9 +10,9 @@ struct Text {
 }
 
 impl Text {
-    fn new(text: String, x: i32, y: i32, font_size: i32, color: Color) -> Self {
+    fn new(data: String, x: i32, y: i32, font_size: i32, color: Color) -> Self {
         Self {
-            text,
+            data,
             x,
             y,
             font_size,
@@ -22,7 +22,7 @@ impl Text {
 
     fn default() -> Self {
         Self {
-            text: String::from("Hello world!"),
+            data: String::from("Hello world!"),
             x: 12,
             y: 12,
             font_size: 30,
@@ -33,6 +33,18 @@ impl Text {
 
 struct TextBuffer {
     texts: Vec<Text>,
+}
+
+impl TextBuffer {
+    fn new() -> Self {
+        Self {
+            texts: Vec::new()
+        }
+    }
+
+    fn push(&mut self, t: Text) {
+       self.texts.push(t); 
+    }
 }
 
 fn main() {
@@ -50,7 +62,19 @@ fn main() {
     let mut color_index = 0;
     let mut timer = 0.0;
     let tick_speed = 0.25; // seconds
+    let mut buf = TextBuffer::new();
     let ui_names = vec!["timer", "tick_speed", "color_index"];
+    let ui_positions_y = vec![0, 10, 20];
+    for i in 0..ui_names.len() {
+        let t = Text::new(
+            ui_names[i].to_string(),
+            12,
+            ui_positions_y[i],
+            30,
+            Color::BLACK,
+        );
+        buf.push(t);
+    }
 
     while !rl_handle.window_should_close() {
         timer += rl_handle.get_frame_time();
@@ -63,11 +87,20 @@ fn main() {
         let my_text = Text::default();
         d.clear_background(Color::WHITE);
         d.draw_text(
-            my_text.text.as_str(),
+            my_text.data.as_str(),
             my_text.x,
             my_text.y,
             my_text.font_size,
             colors[color_index],
         );
+        for text in buf {
+            d.draw_text{
+                text.data.as_str(),
+                text.x,
+                text.y,
+                text.font_size,
+                text.color,
+            }
+        }
     }
 }
